@@ -6,7 +6,23 @@ V1.0 - Fragen und Anmerkungen jan.eggers (klammeraffe) hr.de
 
 ## Aufbau
 
-Das Skript update_feldmann() ist dazu gedacht, 1x pro Minute aufgerufen zu werden. 
+- R - Programm- und Hilfscode
+- index - Konfigurations- und Indexdateien z.B. mit den Stadtteilzuordnungen
+- daten - Ausgabeordner für die aus dem Netz gelesenen und aufbereiteten Daten
+- testdaten - Künstlich generierte Test-Dateien zur Simulation
+
+### R-Dateien im Ordner R
+
+- update_feldmann.R - Hauptskript
+- lies_aktuellen_stand.R - Funktionen zur Datenakquise und -aufbereitung
+- aktualisiere_karten.R - Update der Datawrapper-Karten und -Tabelle im Ortsteilergebnissen
+- generiere_balken.R - Funktionen zur Generierung des HTML/CSS-Codes für die Datawrapper-Darstellungen
+- messaging.R - Status- und Fehlermeldung über MS Teams
+- generiere_testdaten.R - Zufällige Erzeugung von Simulationsdateien
+
+- daten_vorbereiten.R - Hilfsskripte zur einmaligen Erzeugung der Index-Dateien
+
+Das Skript **update_feldmann()** ist gewissermaßen das Hauptprogramm. Es ist dazu gedacht, 1x pro Minute aufgerufen zu werden. 
 Es lädt die Wahllokal-Daten und vergleicht sie mit dem letzten abgelegten Stand - 
 wenn sich nichts verändert hat, wird das Skript beendet. 
 
@@ -21,12 +37,19 @@ das kann man in dieser Form auch direkt vom Server der Stadt ziehen; da ich aber
 die Zuordnung der Wahllokale zu den Stadtteilen habe und selbst aggregieren kann, 
 rechnet eine Routine es schnell selbst. 
 
-Aus der Stadtteil-Auszählung werden die drei Datawrapper-Grafiken auf den aktuellen
+Durch Aufruf der Funktion **aktualisiere_karten()** werden die Ortsdaten erzeugt und für die Stadtteile in Datawrapper ausgegeben. Aus der Stadtteil-Auszählung werden die drei Datawrapper-Grafiken auf den aktuellen
 Stand gebracht: 
 - eine Choropleth-Karte mit dem Anteil der Ja-Stimmen an der Wahlbevölkerung,
 - eine Symbol-Karte mit den absoluten Ja-Stimmen nach Wahlbezirk, 
 - eine Tabelle mit den Ergebnissen in barrierefreier Form. 
 
+### index-Dateien
+
+- config.csv enthält die URL, von der Daten gelesen werden, die Anzahl der Wahlberechtigten für Frankfurt (diese Zahl wird Sonntag 18 Uhr aktualisiert) und die IDs von Datawrapper-Zielen. 
+- stadtteile-skaliert_08.geojson - Shapefile für die Datawrapper-Darstellungn der Ergebnisse
+- stadtteile.csv - eine Datei mit den Namen der Ortsteile, Geokoordinaten mit einem Punkt, und den Wahlergebnissen des 1. Wahlgangs der Bürgermeisterwahl 2018 zum Vergleich
+- zuordnung_wahllokale.csv - die Zuordnung der Wahllokale zu den Ortsteilen
+- opendata-wahllokale.csv - Adressen der Wahllokale vom Wahlamt
 
 ## Datenquelle und Datenformat
 
