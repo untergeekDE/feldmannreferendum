@@ -60,7 +60,7 @@ aktualisiere_fom <- function(wl_url = wahllokale_url) {
     return(FALSE)
   } else {
     # Archiviere die Rohdaten 
-    archiviere(wahllokale_df,"dateh/wahllokale/")
+    archiviere(wahllokale_df,"daten/wahllokale/")
     # Ergänze das fom_df um die neuen Daten und sichere es
     fom_df <- fom_df %>% bind_rows(neue_fom_df)
     saveRDS(fom_df,"daten/fom_df.rds")
@@ -141,7 +141,31 @@ if (neue_daten) {
     warning = function(w) {teams_warning(w,title="Feldmann: Karten")},
     error = function(e) {teams_warning(e,title="Feldmann: Karten")})
   if (neue_daten) {
-    teams_meldung("Daten aktualisiert - OK",title="Feldmann-Referendum")
+    # Alles OK, letzte Daten nochmal holen und ausgeben
+    fom_df <- readRDS("daten/fom_df.rds") %>% 
+      arrange(zeitstempel) %>% 
+      tail(1)
+    if(fom_df$meldungen_anz > 0) {
+      fom_update_str <- paste0(
+        "<strong>Update OK</strong><br/><br/>",
+        fom_df$meldungen_anz," von ",fom_df$meldungen_max," Wahllokale ausgezählt ",
+        "<ul><li><strong>Quorum zur Abwahl ist derzeit",
+        ifelse(fom_df$ja / fom_df$wahlberechtigt < 0.3, " nicht ", " "),
+        "erreicht</strong></li>",
+        "<li><strong>Anteil der Ja-Stimmen an den Wahlberechtigten: ",
+        format(fom_df$ja / fom_df$wahlberechtigt * 100,decimal.mark=",",big.mark=".",nsmall=1, digits=3),
+        "</li><li>Ja-Stimmen: ",
+        format(fom_df$ja,decimal.mark=",",big.mark=".",nsmall=1, digits=3),
+        "</li><li>Nein-Stimmen: ",
+        format(fom_df$nein,decimal.mark=",",big.mark=".",nsmall=1, digits=3),
+        "</li><li>Verhältnis Ja:Nein: ",
+        format(fom_df$ja / (fom_df$ja + fom_df$nein),decimal.mark=",",big.mark=".",nsmall=1, digits=3),"% : ",
+        format(fom_df$nein / (fom_df$ja + fom_df$nein),decimal.mark=",",big.mark=".",nsmall=1, digits=3),"%</li></ul>",
+        format(fom_df$ja / fom_df$wahlberechtigt,decimal.mark=",",big.mark=".",nsmall=1, digits=3),
+      )
+      teams_meldung(fom_update_str,title="Feldmann-Referendum")
+
+    }
   } else {
     teams_warning("Neue Wahllokal-Daten, aber keine neuen Ortsdaten?")
   }

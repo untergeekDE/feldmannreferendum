@@ -2,7 +2,7 @@
 
 R-Routinen, um die Abstimmungsergebnisse des Referendums in Frankfurt am 6. November 2022 auf die hessenschau.de-Website zu bringen. 
 
-V1.0 - Fragen und Anmerkungen jan.eggers (klammeraffe) hr.de
+V1.01 - Fragen und Anmerkungen jan.eggers (klammeraffe) hr.de
 
 ## Aufbau
 
