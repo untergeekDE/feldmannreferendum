@@ -1,8 +1,8 @@
 name,value,comment
 wahllokale_url,https://votemanager-ffm.ekom21cdn.de/2022-11-06/06412000/praesentation/Open-Data-06412000-Buergerentscheid-zur-Abwahl-des-Oberbuergermeisters-der-Stadt-Frankfurt-am-Main_-Herrn-Peter-Feldmann-Stimmbezirk.csv?ts=1667586196549,
 ffm_waehler,510000,Schätzung Wählerinnen und Wähler – wird Sonntagabend aktualisiert
-fom_id,raDG0,Datawrapper-ID Feldmann-o-meter
-choropleth_id,w6caA,Datawrapper-ID Stadtteile Choropleth-Karte
-symbol_id,ANKmx,Datawrapper-ID Stadtteile Symbole (absolute Stimmen)
-tabelle_id,Un8Zz,Datawrapper-ID Tabelle Stadtteile
+fom_id,,Datawrapper-ID Feldmann-o-meter
+choropleth_id,,Datawrapper-ID Stadtteile Choropleth-Karte
+symbol_id,,Datawrapper-ID Stadtteile Symbole (absolute Stimmen)
+tabelle_id,,Datawrapper-ID Tabelle Stadtteile
 startdatum,2022-11-06 18:00:00 CET,Beginn der Auszählung

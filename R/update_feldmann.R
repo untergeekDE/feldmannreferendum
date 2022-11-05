@@ -164,15 +164,15 @@ if (neue_daten) {
         ifelse(fom_df$ja / fom_df$wahlberechtigt < 0.3, " nicht ", " "),
         "erreicht</strong></li>",
         "<li><strong>Anteil der Ja-Stimmen an den Wahlberechtigten: ",
-        format(fom_df$ja / fom_df$wahlberechtigt * 100,decimal.mark=",",big.mark=".",nsmall=1, digits=3),
+        format(fom_df$ja / fom_df$wahlberechtigt * 100,decimal.mark=",",big.mark=".",nsmall=1, digits=3),"%",
         "</li><li>Ja-Stimmen: ",
         format(fom_df$ja,decimal.mark=",",big.mark="."),
         "</li><li>Nein-Stimmen: ",
         format(fom_df$nein,decimal.mark=",",big.mark="."),
         "</li><li>Verhältnis Ja:Nein: ",
-        format(fom_df$ja / (fom_df$ja + fom_df$nein),decimal.mark=",",big.mark=".",nsmall=1, digits=3),"% : ",
-        format(fom_df$nein / (fom_df$ja + fom_df$nein),decimal.mark=",",big.mark=".",nsmall=1, digits=3),"%</li></ul>",
-        format(fom_df$ja / fom_df$wahlberechtigt,decimal.mark=",",big.mark=".",nsmall=1, digits=3)
+        format(fom_df$ja / (fom_df$ja + fom_df$nein) * 100,decimal.mark=",",big.mark=".",nsmall=1, digits=3),"% : ",
+        format(fom_df$nein / (fom_df$ja + fom_df$nein) *100,decimal.mark=",",big.mark=".",nsmall=1, digits=3),"%</li></ul>"
+        
       )
       teams_meldung(fom_update_str,title="Feldmann-Referendum")
 
