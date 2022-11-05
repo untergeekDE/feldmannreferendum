@@ -143,7 +143,7 @@ generiere_auszählungsbalken <- function(ausgezählt,anz,max,ts) {
                          format.Date(ts, "%d.%m.%y, %H:%M Uhr"),
                          "</strong> - ",
                          anz," von ",max,
-                         " Wahllokalen ausgezählt<br>"
+                         " Stimmbezirken ausgezählt<br>"
   )
   
 }

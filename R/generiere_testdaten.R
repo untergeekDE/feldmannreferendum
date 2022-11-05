@@ -1,6 +1,6 @@
 #' generiere_testdaten.R
 #' 
-#' Macht aus den Templates für Ortsteil- und Wahllokal-Ergebnisse
+#' Macht aus den Templates für Ortsteil- und Stimmbezirk-Ergebnisse
 #' jeweils eine Serie von fiktiven Livedaten, um das Befüllen der
 #' Grafiken testen zu können. 
 #' 
@@ -27,24 +27,24 @@ lösche_testdaten <- function(){
   for (f in testdaten_files) {
     # Grausam, I know. 
     if (str_detect(f,"ortsteile[0-9]+\\.csv") |
-        str_detect(f,"wahllokale[0-9]+\\.csv")) {
+        str_detect(f,"stimmbezirke[0-9]+\\.csv")) {
       file.remove(f)
     }
   }
 }
 
 # Vorlagen laden
-vorlage_wahllokale_df <- read_delim("testdaten/Open-Data-06412000-Buergerentscheid-zur-Abwahl-des-Oberbuergermeisters-der-Stadt-Frankfurt-am-Main_-Herrn-Peter-Feldmann-Stimmbezirk.csv", 
+vorlage_stimmbezirke_df <- read_delim("testdaten/Open-Data-06412000-Buergerentscheid-zur-Abwahl-des-Oberbuergermeisters-der-Stadt-Frankfurt-am-Main_-Herrn-Peter-Feldmann-Stimmbezirk.csv", 
                                    delim = ";", escape_double = FALSE, 
                                    locale = locale(date_names = "de", 
                                                    decimal_mark = ",", 
                                                    grouping_mark = "."), 
                                    trim_ws = TRUE)
 
-wahllokale_max <- sum(vorlage_wahllokale_df$`max-schnellmeldungen`)
+stimmbezirke_max <- sum(vorlage_stimmbezirke_df$`max-schnellmeldungen`)
 
 # Konstanten für die Simulation - werden jeweils um bis zu +/-25% variiert
-c_wahlberechtigt = 510000 / wahllokale_max # Gleich große Wahlbezirke
+c_wahlberechtigt = 510000 / stimmbezirke_max # Gleich große stimmbezirke
 c_wahlbeteiligung = 0.3 # Wahlbeteiligung um 30%, wird im Lauf der "Wahl" erhöht (kleinere WL sind schneller ausgezählt)
 c_wahlschein = 0.25 # 25% Briefwähler
 c_nv = 0.05 # 0,5% wählen "spontan" und sind nicht verzeichnet (nv) im Wählerverzeichnis
@@ -63,13 +63,13 @@ variiere <- function(x = 1) {
 
 
 i = 1
-# Schleife für die Wahllokale: Solange noch nicht alle "ausgezählt" sind...
-while(sum(vorlage_wahllokale_df$`anz-schnellmeldungen`) < wahllokale_max) {
+# Schleife für die stimmbezirke: Solange noch nicht alle "ausgezählt" sind...
+while(sum(vorlage_stimmbezirke_df$`anz-schnellmeldungen`) < stimmbezirke_max) {
   # ...splitte das df in die gemeldeten (meldungen_anz == 1) und nicht gemeldeten Zeilen
-  tmp_gemeldet_df <- vorlage_wahllokale_df %>% filter(`anz-schnellmeldungen` == 1)
-  # Die Variable rand wird als Anteil von 20 Meldungen an debn noch offenen Wahllokale berechnet
-  rand <- 20 / (nrow(vorlage_wahllokale_df) - nrow(tmp_gemeldet_df)) 
-  tmp_sample_df <- vorlage_wahllokale_df %>% 
+  tmp_gemeldet_df <- vorlage_stimmbezirke_df %>% filter(`anz-schnellmeldungen` == 1)
+  # Die Variable rand wird als Anteil von 20 Meldungen an debn noch offenen stimmbezirke berechnet
+  rand <- 20 / (nrow(vorlage_stimmbezirke_df) - nrow(tmp_gemeldet_df)) 
+  tmp_sample_df <- vorlage_stimmbezirke_df %>% 
     filter(`anz-schnellmeldungen` == 0) %>% 
     # Bei den noch nicht ausgefüllten "Meldungen" mit einer Wahrscheinlichkeit
     # von rand in die Gruppe sortieren, die neu "gemeldet" wird
@@ -106,23 +106,23 @@ while(sum(vorlage_wahllokale_df$`anz-schnellmeldungen`) < wahllokale_max) {
   # Kurze Statusmeldung
   cat("Neu gemeldet:",nrow(tmp_neu_df),"noch offen:",nrow(tmp_offen_df))
   # Phew. Aktualisierte Testdatei zusammenführen und anlegen. 
-  vorlage_wahllokale_df <- tmp_gemeldet_df %>% 
+  vorlage_stimmbezirke_df <- tmp_gemeldet_df %>% 
     bind_rows(tmp_neu_df) %>% 
     bind_rows(tmp_offen_df) %>%
-    # wieder in die Reihenfolge nach Wahllokal-Nummer
+    # wieder in die Reihenfolge nach stimmbezirk-Nummer
     arrange(`gebiet-nr`)
   
-  write_csv2(vorlage_wahllokale_df,
-             paste0("testdaten/wahllokale",
+  write_csv2(vorlage_stimmbezirke_df,
+             paste0("testdaten/stimmbezirke",
                     sprintf("%02i",i),
                     ".csv"),
              escape = "backslash")
   # Generiere die passende Ortsteil-Meldung
   # Geht aus irgeneindem Grund nicht, aber wir brauchens ja auch nicht. 
-  # ortsteile_df <- zuordnung_wahllokale_df %>% 
+  # ortsteile_df <- zuordnung_stimmbezirke_df %>% 
   #   select(`gebiet-name` = name,ortsteilnr) %>% 
-  #   left_join(vorlage_wahllokale_df,by="gebiet-name") %>% 
-  #   # Zuordnung der Wahllokale
+  #   left_join(vorlage_stimmbezirke_df,by="gebiet-name") %>% 
+  #   # Zuordnung der stimmbezirke
   #   group_by(ortsteilnr) %>% 
   #   # Das crasht - WTF???
   #   summarize(across(7:18, ~ sum(.,na.rm = T))) %>%
@@ -133,7 +133,7 @@ while(sum(vorlage_wahllokale_df$`anz-schnellmeldungen`) < wahllokale_max) {
     
   i <- i+1
   # Wahlbeteiligung schrittweise ein wenig anheben - um zu simulieren, 
-  # dass "kleinere" Wahllokale zuerst ausgezählt werden
+  # dass "kleinere" stimmbezirke zuerst ausgezählt werden
   c_wahlbeteiligung <- c_wahlbeteiligung + 0.002
 }
 

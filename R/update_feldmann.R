@@ -26,7 +26,7 @@ source("R/generiere_balken.R")
 #----aktualisiere_fom() ----
 # fom ist das "Feldmann-o-meter", die zentrale Grafik mit dem Stand der Auszählung.
 
-aktualisiere_fom <- function(wl_url = wahllokale_url) {
+aktualisiere_fom <- function(wl_url = stimmbezirke_url) {
   
   # Einlesen: Feldmann-o-meter-Daten so far. 
   # Wenn die Daten noch nicht existieren, generiere ein leeres df. 
@@ -57,8 +57,8 @@ aktualisiere_fom <- function(wl_url = wahllokale_url) {
     arrange(zeitstempel) %>% 
     tail(1)
   # Neue Daten holen (mit Fehlerbehandlung)
-  wahllokale_df <- lies_gebiet(wl_url) 
-  neue_fom_df <- wahllokale_df %>% 
+  stimmbezirke_df <- lies_gebiet(wl_url) 
+  neue_fom_df <- stimmbezirke_df %>% 
     # Namen raus
     select(-name,-nr) %>% 
     # Daten aufsummieren
@@ -69,7 +69,7 @@ aktualisiere_fom <- function(wl_url = wahllokale_url) {
     return(FALSE)
   } else {
     # Archiviere die Rohdaten 
-    archiviere(wahllokale_df,"daten/wahllokale/")
+    archiviere(stimmbezirke_df,"daten/stimmbezirke/")
     # Ergänze das fom_df um die neuen Daten und sichere es
     fom_df <- fom_df %>% bind_rows(neue_fom_df)
     saveRDS(fom_df,"daten/fom_df.rds")
@@ -137,7 +137,7 @@ aktualisiere_fom <- function(wl_url = wahllokale_url) {
 # (die dann wieder aktualisiere_karten() aufruft)
 check = tryCatch(
   { 
-    neue_daten <- aktualisiere_fom(wahllokale_url)
+    neue_daten <- aktualisiere_fom(stimmbezirke_url)
   },
   warning = function(w) {teams_warning(w,title="Feldmann: fom")},
   error = function(e) {teams_warning(e,title="Feldmann: fom")})
@@ -145,7 +145,7 @@ check = tryCatch(
 if (neue_daten) {
   check = tryCatch(
     { 
-      neue_daten <- aktualisiere_karten(wahllokale_url)
+      neue_daten <- aktualisiere_karten(stimmbezirke_url)
     },
     warning = function(w) {teams_warning(w,title="Feldmann: Karten")},
     error = function(e) {teams_warning(e,title="Feldmann: Karten")})
@@ -159,7 +159,7 @@ if (neue_daten) {
         "<strong>Update OK</strong><br/><br/>",
         fom_df$meldungen_anz,
         " von ",
-        fom_df$meldungen_max," Wahllokale ausgezählt ",
+        fom_df$meldungen_max," Stimmbezirke ausgezählt ",
         "<ul><li><strong>Quorum zur Abwahl ist derzeit",
         ifelse(fom_df$ja / fom_df$wahlberechtigt < 0.3, " nicht ", " "),
         "erreicht</strong></li>",
@@ -178,7 +178,7 @@ if (neue_daten) {
 
     }
   } else {
-    teams_warning("Neue Wahllokal-Daten, aber keine neuen Ortsdaten?")
+    teams_warning("Neue Stimmbezirk-Daten, aber keine neuen Ortsdaten?")
   }
 } 
 # Auch hier TRUE zurückbekommen;; alles OK?

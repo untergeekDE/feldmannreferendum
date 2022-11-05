@@ -32,7 +32,7 @@ for (i in c(1:nrow(config_df))) {
 
 
 #---- Daten ins Archiv schreiben oder daraus lesen
-archiviere <- function(df,a_directory = "daten/wahllokale") {
+archiviere <- function(df,a_directory = "daten/stimmbezirke") {
   if (!dir.exists(a_directory)) {
     dir.create(a_directory)
   }
@@ -45,7 +45,7 @@ archiviere <- function(df,a_directory = "daten/wahllokale") {
                    ".csv"))
 }
 
-hole_letztes_df <- function(a_directory = "daten/wahllokale") {
+hole_letztes_df <- function(a_directory = "daten/stimmbezirke") {
   if (!dir.exists(a_directory)) return(tibble())
   neuester_file <- list.files(a_directory, full.names=TRUE) %>% 
     file.info() %>% 
@@ -65,7 +65,7 @@ hole_letztes_df <- function(a_directory = "daten/wahllokale") {
 
 
 #---- Lese-Funktionen ----
-lies_gebiet <- function(stand_url = wahllokale_url) {
+lies_gebiet <- function(stand_url = stimmbezirke_url) {
   ts <- now()
   # Versuch Daten zu lesen - und gib ggf. Warnung oder Fehler zurück
   check = tryCatch(
@@ -113,11 +113,11 @@ vergleiche_stand <- function(alt_df, neu_df) {
   return(sum(abs(neu_sum_df - alt_sum_df))==0)
 }
 
-#' Liest Wahllokale, gibt nach Ortsteil aggregierte Daten zurück
+#' Liest Stimmbezirke, gibt nach Ortsteil aggregierte Daten zurück
 #' (hier: kein Sicherheitscheck)
-aggregiere_stadtteile <- function(wahllokale_df) {
-  ortsteile_df <- wahllokale_df %>% 
-    left_join(zuordnung_wahllokale_df,by=c("nr","name")) %>% 
+aggregiere_stadtteile <- function(stimmbezirke_df) {
+  ortsteile_df <- stimmbezirke_df %>% 
+    left_join(zuordnung_stimmbezirke_df,by=c("nr","name")) %>% 
     group_by(ortsteilnr) %>% 
     summarize(zeitstempel = last(zeitstempel),
               across(meldungen_anz:nein, ~ sum(.,na.rm = T))) %>%
@@ -131,7 +131,7 @@ aggregiere_stadtteile <- function(wahllokale_df) {
     
   # Sicherheitscheck: Warnen, wenn nicht alle Ortsteile zugeordnet
   if (nrow(ortsteile_df) != nrow(stadtteile_df)) teams_warnung("Nicht alle Ortsteile zugeordnet")
-  if (nrow(zuordnung_wahllokale_df) != length(unique(wahllokale_df$nr))) teams_warnung("Nicht alle Wahllokale zugeordnet")
+  if (nrow(zuordnung_stimmbezirke_df) != length(unique(stimmbezirke_df$nr))) teams_warnung("Nicht alle Stimmbezirke zugeordnet")
   return(ortsteile_df)
 }
 

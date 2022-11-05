@@ -1,7 +1,7 @@
 #' aktualisiere_karten.R
 
 
-aktualisiere_karten <- function(wl_url = wahllokale_url) {
+aktualisiere_karten <- function(wl_url = stimmbezirke_url) {
   # Lies Ortsteil-Daten ein und vergleiche
   neue_orts_df <- lies_gebiet(wl_url) %>% 
     aggregiere_stadtteile() %>% 

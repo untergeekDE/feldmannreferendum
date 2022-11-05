@@ -40,8 +40,8 @@ rechnet eine Routine es schnell selbst.
 Durch Aufruf der Funktion **aktualisiere_karten()** werden die Ortsdaten erzeugt und für die Stadtteile in Datawrapper ausgegeben. Aus der Stadtteil-Auszählung werden die drei Datawrapper-Grafiken auf den aktuellen
 Stand gebracht: 
 - eine Choropleth-Karte mit dem Anteil der Ja-Stimmen an der Wahlbevölkerung,
-- eine Symbol-Karte mit den absoluten Ja-Stimmen nach Wahlbezirk, 
-- eine Tabelle mit den Ergebnissen in barrierefreier Form. 
+- eine Symbol-Karte mit den absoluten Ja-Stimmen nach Ortsteil, 
+- eine Tabelle mit den Ortsteil-Ergebnissen in barrierefreier Form. 
 
 ### index-Dateien
 
@@ -53,7 +53,7 @@ Stand gebracht:
 
 ## Datenquelle und Datenformat
 
-Nutzt die Livedaten von https://wahlen.frankfurt.de - die aktuellen Daten nach Wahllokal, Ortsteil und Ortsbezirk sind als CSV-Datei [auf dieser Seite zu finden](https://votemanager-ffm.ekom21cdn.de/2022-11-06/06412000/praesentation/opendata.html). Dort ist das Datenformat auch erklärt: 
+Nutzt die Livedaten von https://wahlen.frankfurt.de - die aktuellen Daten nach Ortsteil und Stimmbezirk sind als CSV-Datei [auf dieser Seite zu finden](https://votemanager-ffm.ekom21cdn.de/2022-11-06/06412000/praesentation/opendata.html). Dort ist das Datenformat auch erklärt: 
  -  datum : Datum des Wahltermins
  -  wahl : Name der Wahl
  -  ags : AGS der Behörde
@@ -72,12 +72,14 @@ Nutzt die Livedaten von https://wahlen.frankfurt.de - die aktuellen Daten nach W
  -  D1 : Ja-Stimmen
  -  D2 : Nein-Stimmen
  
+Es gibt 575 Stimmbezirke - also administrative Auszählungs-Einheiten. Fast 200 von diesen "Bezirken" sind die Briefwahl-Auszählungen - sie werden alle in der Messe ausgezählt. Insgesamt gibt es 2019 Wahllokale. (vgl. index/opendata-wahllokale.csv)
+ 
 ## Wann gibt es wo Daten?
  
- - Sobald ein Wahllokal ausgezählt ist, wird eine "Schnellmeldung" erzeugt und werden die CSVs aktualisiert. 
- - Eine Schnellmeldung umfasst ein Wahllokal.
+ - Sobald einer der 575 Stimmbezirke ausgezählt ist, wird eine "Schnellmeldung" erzeugt und werden die CSVs aktualisiert. 
+ - Eine Schnellmeldung umfasst einen Stimmbezirk, ein Wahllokal idR mehrere davon.
  - Nicht ausgezählte Wahllokale enthalten NA bei Wahlberechtigten/Wählern
  - Ortsteile haben, solang sie noch nicht ganz ausgezählt sind, fiktive Wahlberechtigten-Zahlen - die dann nur die Wahllokale abbilden, die bereits ausgezählt sind. (Beispiel: Ein Ortsteil hat 3000 Wahlberechtigte in 3 Wahllokal-Bezirken mit jeweils 1000 Wahlberechtigten - solange nur 2 ausgezählt sind, wird für den Ortsteil eine Wahlberechtigten-Anzahl von 2000 angezeigt.)
- - Briefwahl"lokale" - die Wahllokale mit den Nummern 9xx-xx - haben 0 Wahlberechtigte.  
+ - Briefwahl"lokale" - die Stimmbezirke mit den Nummern 9xx-xx - haben 0 Wahlberechtigte.  
  
 **An dieser Stelle ein Dankeschön an das Wahlamt der Stadt Frankfurt, das trotz Zeitdrucks geduldig und kompetent Unterstützung geleistet hat.**
