@@ -61,8 +61,8 @@ write_csv(stadtteile_df,"index/stadtteile.csv")
 
 #---- Die Index-Daten alle in ein handliches .rda verpacken----
 stadtteile_df <- read_csv("index/stadtteile.csv")
-zuordnung_wahllokale_df <- read_csv("index/zuordnung_wahllokale.csv")
+zuordnung_stimmbezirke_df <- read_csv("index/zuordnung_wahllokale.csv")
 opendata_wahllokale_df <- read_csv2("index/opendata-wahllokale.csv") 
 
-save(stadtteile_df,zuordnung_wahllokale_df,opendata_wahllokale_df,file ="index/index.rda")
+save(stadtteile_df,zuordnung_stimmbezirke_df,opendata_wahllokale_df,file ="index/index.rda")
 
