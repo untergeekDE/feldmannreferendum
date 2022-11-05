@@ -6,10 +6,10 @@ aktualisiere_karten <- function(wl_url = stimmbezirke_url) {
   neue_orts_df <- lies_gebiet(wl_url) %>% 
     aggregiere_stadtteile() %>% 
     mutate(quorum = ifelse(wahlberechtigt == 0,
-                           NA,
+                           0,
                            ja / wahlberechtigt * 100)) %>% 
     mutate(status = ifelse(meldungen_anz == 0,
-                           NA,
+                           "KEINE DATEN",
                            paste0(ifelse(meldungen_anz < meldungen_max,
                                           "TREND ",""),
                                    ifelse(ja < nein,
