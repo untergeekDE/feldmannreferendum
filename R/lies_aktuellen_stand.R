@@ -35,7 +35,6 @@ for (i in c(1:nrow(config_df))) {
 archiviere <- function(df,a_directory = "daten/wahllokale") {
   if (!dir.exists(a_directory)) {
     dir.create(a_directory)
-    teams_warning(a_directory," neu angelegt")
   }
   write_csv(df,
             paste0(a_directory,"/",

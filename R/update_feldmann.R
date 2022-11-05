@@ -1,11 +1,20 @@
-library(readr)
-library(lubridate)
-library(tidyr)
-library(stringr)
-library(dplyr)
-library(DatawRappr)
+library(pacman)
+
+# Laden und ggf. installieren
+p_load(this.path)
+p_load(readr)
+p_load(lubridate)
+p_load(tidyr)
+p_load(stringr)
+p_load(dplyr)
+p_load(DatawRappr)
 
 rm(list=ls())
+
+# Aktuelles Verzeichnis als workdir
+setwd(this.path::this.dir())
+# Aus dem R-Verzeichnis eine Ebene rauf
+setwd("..")
 
 
 source("R/messaging.R")
@@ -148,20 +157,22 @@ if (neue_daten) {
     if(fom_df$meldungen_anz > 0) {
       fom_update_str <- paste0(
         "<strong>Update OK</strong><br/><br/>",
-        fom_df$meldungen_anz," von ",fom_df$meldungen_max," Wahllokale ausgezählt ",
+        fom_df$meldungen_anz,
+        " von ",
+        fom_df$meldungen_max," Wahllokale ausgezählt ",
         "<ul><li><strong>Quorum zur Abwahl ist derzeit",
         ifelse(fom_df$ja / fom_df$wahlberechtigt < 0.3, " nicht ", " "),
         "erreicht</strong></li>",
         "<li><strong>Anteil der Ja-Stimmen an den Wahlberechtigten: ",
         format(fom_df$ja / fom_df$wahlberechtigt * 100,decimal.mark=",",big.mark=".",nsmall=1, digits=3),
         "</li><li>Ja-Stimmen: ",
-        format(fom_df$ja,decimal.mark=",",big.mark=".",nsmall=1, digits=3),
+        format(fom_df$ja,decimal.mark=",",big.mark="."),
         "</li><li>Nein-Stimmen: ",
-        format(fom_df$nein,decimal.mark=",",big.mark=".",nsmall=1, digits=3),
+        format(fom_df$nein,decimal.mark=",",big.mark="."),
         "</li><li>Verhältnis Ja:Nein: ",
         format(fom_df$ja / (fom_df$ja + fom_df$nein),decimal.mark=",",big.mark=".",nsmall=1, digits=3),"% : ",
         format(fom_df$nein / (fom_df$ja + fom_df$nein),decimal.mark=",",big.mark=".",nsmall=1, digits=3),"%</li></ul>",
-        format(fom_df$ja / fom_df$wahlberechtigt,decimal.mark=",",big.mark=".",nsmall=1, digits=3),
+        format(fom_df$ja / fom_df$wahlberechtigt,decimal.mark=",",big.mark=".",nsmall=1, digits=3)
       )
       teams_meldung(fom_update_str,title="Feldmann-Referendum")
 
@@ -171,6 +182,3 @@ if (neue_daten) {
   }
 } 
 # Auch hier TRUE zurückbekommen;; alles OK?
-
-
-

@@ -9,9 +9,14 @@ library(teamr)
 #' 
 #' Kommunikation mit Teams
 #' 
-#' Webhook wird als 
-#' 
-#' 
+#' Webhook wird als URL im Environment gespeichert. Wenn nicht dort, dann 
+
+# Webhook schon im Environment? 
+if (Sys.getenv("WEBHOOK_REFERENDUM") == "") {
+  t_txt <- read_file("")
+  Sys.setenv(WEBHOOK_REFERENDUM = t_txt)
+}
+
 teams_meldung <- function(...,title="Feldmann-Update") {
   cc <- teamr::connector_card$new(hookurl = Sys.getenv("WEBHOOK_REFERENDUM"))
   cc$title(paste0(title," - ",lubridate::with_tz(lubridate::now(),
