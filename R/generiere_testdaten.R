@@ -12,6 +12,27 @@ require(readr)
 # Alles weg, was noch im Speicher rumliegt
 rm(list=ls())
 
+source("R/lies_aktuellen_stand.R")
+
+#---- Funktion zum Testdaten-Löschen ----
+lösche_testdaten <- function(){
+  q <- tolower(readline(prompt = "Testdaten löschen - sicher? "))
+  if (!(q %in% c("j","y","ja"))) { return() }
+  # Datenarchiv weg
+  if (file.exists("daten/fom_df.rds")){
+    file.remove("daten/fom_df.rds")
+  }
+  # Testdaten
+  testdaten_files <- list.files("testdaten", full.names=TRUE) 
+  for (f in testdaten_files) {
+    # Grausam, I know. 
+    if (str_detect(f,"ortsteile[0-9]+\\.csv") |
+        str_detect(f,"wahllokale[0-9]+\\.csv")) {
+      file.remove(f)
+    }
+  }
+}
+
 # Vorlagen laden
 vorlage_wahllokale_df <- read_delim("testdaten/Open-Data-06412000-Buergerentscheid-zur-Abwahl-des-Oberbuergermeisters-der-Stadt-Frankfurt-am-Main_-Herrn-Peter-Feldmann-Stimmbezirk.csv", 
                                    delim = ";", escape_double = FALSE, 
@@ -23,7 +44,6 @@ vorlage_wahllokale_df <- read_delim("testdaten/Open-Data-06412000-Buergerentsche
 wahllokale_max <- sum(vorlage_wahllokale_df$`max-schnellmeldungen`)
 
 # Konstanten für die Simulation - werden jeweils um bis zu +/-25% variiert
-rand <- 0.5 # Wahrscheinlichkeit für eine neue "Meldung" bei 1/2
 c_wahlberechtigt = 510000 / wahllokale_max # Gleich große Wahlbezirke
 c_wahlbeteiligung = 0.31 # Wahlbeteiligung um 31%
 c_wahlschein = 0.25 # 25% Briefwähler
@@ -47,6 +67,8 @@ i = 1
 while(sum(vorlage_wahllokale_df$`anz-schnellmeldungen`) < wahllokale_max) {
   # ...splitte das df in die gemeldeten (meldungen_anz == 1) und nicht gemeldeten Zeilen
   tmp_gemeldet_df <- vorlage_wahllokale_df %>% filter(`anz-schnellmeldungen` == 1)
+  # Die Variable rand wird als Anteil von 20 Meldungen an debn noch offenen Wahllokale berechnet
+  rand <- 20 / (nrow(vorlage_wahllokale_df) - nrow(tmp_gemeldet_df)) 
   tmp_sample_df <- vorlage_wahllokale_df %>% 
     filter(`anz-schnellmeldungen` == 0) %>% 
     # Bei den noch nicht ausgefüllten "Meldungen" mit einer Wahrscheinlichkeit
@@ -91,8 +113,24 @@ while(sum(vorlage_wahllokale_df$`anz-schnellmeldungen`) < wahllokale_max) {
     arrange(`gebiet-nr`)
   
   write_csv2(vorlage_wahllokale_df,
-             paste0("testdaten/wahllokale",i,".csv"),
+             paste0("testdaten/wahllokale",
+                    sprintf("%02i",i),
+                    ".csv"),
              escape = "backslash")
+  # Generiere die passende Ortsteil-Meldung
+  # Geht aus irgeneindem Grund nicht, aber wir brauchens ja auch nicht. 
+  # ortsteile_df <- zuordnung_wahllokale_df %>% 
+  #   select(`gebiet-name` = name,ortsteilnr) %>% 
+  #   left_join(vorlage_wahllokale_df,by="gebiet-name") %>% 
+  #   # Zuordnung der Wahllokale
+  #   group_by(ortsteilnr) %>% 
+  #   # Das crasht - WTF???
+  #   summarize(across(7:18, ~ sum(.,na.rm = T))) %>%
+  #   left_join(stadtteile_df %>% select(ortsteilnr = nr,name),by="ortsteilnr") %>% 
+  #   rename(`gebiet-nr` = ortsteilnr) %>% 
+  #   mutate(`gebiet-name` = name) %>% 
+  #   select(-ortsteilnr) 
+    
   i <- i+1
 }
 
