@@ -35,7 +35,7 @@ aktualisiere_fom <- function(wl_url = stimmbezirke_url) {
   } else {
     # Leeres df mit einer Zeile
     fom_df <- tibble(zeitstempel = as_datetime(startdatum),
-                           meldungen_anz = 999,
+                           meldungen_anz = 0,
                            meldungen_max = 575,
                            # Ergebniszellen
                            wahlberechtigt = 0,
@@ -100,7 +100,7 @@ aktualisiere_fom <- function(wl_url = stimmbezirke_url) {
         if (alles_ausgezählt ) {
           feldmann_str <- "Peter Feldmann bleibt OB von Frankfurt."
         } else {
-          feldmann_str <- "Nach dem derzeitigen Auszählungsstand wäre Peter Feldmann als OB abgewählt."
+          feldmann_str <- "Nach dem derzeitigen Auszählungsstand bliebe Peter Feldmann OB von Frankfurt."
         }
       }
     }
@@ -123,8 +123,17 @@ aktualisiere_fom <- function(wl_url = stimmbezirke_url) {
       ausgezählt = floor(neue_fom_df$wahlberechtigt / ffm_waehler * 100),
       anz = neue_fom_df$meldungen_anz,
       max = neue_fom_df$meldungen_max,
-      ts = neue_fom_df$zeitstempel
-    )
+      ts = neue_fom_df$zeitstempel)
+    briefwahl_anz <- stimmbezirke_df %>% filter(str_detect(nr,"^9")) %>% 
+      pull(meldungen_anz) %>% sum()
+    briefwahl_max <- stimmbezirke_df %>% filter(str_detect(nr,"^9")) %>% 
+      nrow()
+    annotate_str <- paste0("<strong>Derzeit sind ",
+                           briefwahl_anz,
+                           " von ",
+                           briefwahl_max, 
+                           " Briefwahl-Stimmbezirken ausgezählt. Dies beeinflusst das Ergebnis stark.</strong><br/><br/>",
+                           annotate_str)
     dw_edit_chart(fom_id,intro = beschreibung_str,annotate = annotate_str)
     dw_publish_chart(fom_id)
     return(TRUE)
@@ -155,11 +164,21 @@ if (neue_daten) {
       arrange(zeitstempel) %>% 
       tail(1)
     if(fom_df$meldungen_anz > 0) {
+      stimmbezirke_df <- lies_gebiet(stimmbezirke_url)
+      briefwahl_anz <- stimmbezirke_df %>% filter(str_detect(nr,"^9")) %>% 
+        pull(meldungen_anz) %>% sum()
+      briefwahl_max <- stimmbezirke_df %>% filter(str_detect(nr,"^9")) %>% 
+        nrow()
       fom_update_str <- paste0(
         "<strong>Update OK</strong><br/><br/>",
         fom_df$meldungen_anz,
         " von ",
-        fom_df$meldungen_max," Stimmbezirke ausgezählt ",
+        fom_df$meldungen_max," Stimmbezirke ausgezählt.<br> ",
+                              "Derzeit sind ",
+                               briefwahl_anz,
+                               " von ",
+                               briefwahl_max, 
+                               " Briefwahl-Stimmbezirken ausgezählt.<br/>",
         "<ul><li><strong>Quorum zur Abwahl ist derzeit",
         ifelse(fom_df$ja / fom_df$wahlberechtigt < 0.3, " nicht ", " "),
         "erreicht</strong></li>",
