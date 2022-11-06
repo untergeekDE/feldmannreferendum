@@ -120,7 +120,8 @@ generiere_balken <- function (wb, ja, nein, auszählung_beendet) {
 }
 
 generiere_auszählungsbalken <- function(ausgezählt,anz,max,ts) {
-  annotate_str <- paste0("Anteil der Wahlberechtigten, die die Auszählung umfasst",
+  ausgezählt <- floor(anz/max*100)
+  annotate_str <- paste0("Anzahl der ausgezählten Wahllokale",
                         # Container Fake-Balken
                          "<span style='height:24px;display: flex;justify-content: space-around;align-items: flex-end; width: 100%;'>",
                             # Vordere Pufferzelle 70px  

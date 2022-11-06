@@ -203,7 +203,7 @@ aggregiere_wahllokale <- function(stimmbezirke_df) {
     arrange(ortsteil) 
   # Sicherheitscheck: Warnen, wenn nicht alle Wahllokale zugeordnet
   if (nrow(wahllokale_df) != length(unique(opendata_wahllokale_df$`Wahlraum-Bezeichnung`))) teams_warnung("Nicht alle Stimmbezirke zugeordnet")
-  return(ortsteile_df)
+  return(wahllokale_df)
 }
 
 

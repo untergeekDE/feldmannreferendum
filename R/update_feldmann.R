@@ -76,8 +76,8 @@ aktualisiere_fom <- function(wl_url = stimmbezirke_url) {
     # Bilde das Dataframe
     # Sende die Daten an Datawrapper und aktualisiere
     fom_dw_df <- fom_df %>% 
-      mutate(ausgezählt = wahlberechtigt / ffm_waehler *100) %>% 
-      mutate(prozent30 = wahlberechtigt * 0.3) %>% 
+      mutate(ausgezählt = meldungen_anz / meldungen_max *100) %>% 
+      mutate(prozent30 = NA) %>% 
       mutate(quorum = ja / wahlberechtigt * 100) %>% 
       select(ausgezählt, wahlberechtigt, ungueltig, ja, nein, quorum, prozent30) %>% 
       # Noch den Endpunkt der 30-Prozent-Linie
@@ -132,7 +132,7 @@ aktualisiere_fom <- function(wl_url = stimmbezirke_url) {
                            briefwahl_anz,
                            " von ",
                            briefwahl_max, 
-                           " Briefwahl-Stimmbezirken ausgezählt. Dies beeinflusst das Ergebnis stark.</strong><br/><br/>",
+                           " Briefwahl-Stimmbezirken ausgezählt.</strong><br/><br/>",
                            annotate_str)
     dw_edit_chart(fom_id,intro = beschreibung_str,annotate = annotate_str)
     dw_publish_chart(fom_id)

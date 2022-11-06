@@ -73,6 +73,8 @@ Nutzt die Livedaten von https://wahlen.frankfurt.de - die aktuellen Daten nach O
  -  D2 : Nein-Stimmen
  
 Es gibt 575 Stimmbezirke - also administrative Auszählungs-Einheiten. Fast 200 von diesen "Bezirken" sind die Briefwahl-Auszählungen - sie werden alle in der Messe ausgezählt. Insgesamt gibt es 219 Wahllokale. (vgl. index/opendata-wahllokale.csv)
+
+Eine kleine Falle wurde erst im Lauf des Wahlabends sichtbar: Die Briefwahl-Ergebnisse kommen systematisch später als alle anderen Ergebnisse - da ein Briefwahl-Stimmbezirk aber rechnerisch 0 Wahlberechtigte hat, kann man ohne die Briefwahl-Stimmen kein Quorum berechnen. Deshalb musste die Logik im Lauf des Abends von "% der Wahlberechtigten ausgezählt" auf "% der Wahllokale ausgezählt" umgestellt werden. 
  
 ## Wann gibt es wo Daten?
  
