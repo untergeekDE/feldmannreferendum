@@ -135,6 +135,79 @@ aggregiere_stadtteile <- function(stimmbezirke_df) {
   return(ortsteile_df)
 }
 
+aggregiere_stadtteile_mit_briefwahl <- function(stimmbezirke_df) {
+  ortsteile_df <- stimmbezirke_df %>% 
+    left_join(zuordnung_stimmbezirke_df,by=c("nr","name")) %>%
+    left_join(opendata_wahllokale_df %>% 
+                select (nr = `Bezirk-Nr`,
+                        typ = `Bezirk-Art`), by="nr") %>% 
+    group_by(ortsteilnr) %>% 
+    summarize(zeitstempel = last(zeitstempel),
+              # Bool'sche Multiplikation: Wenn Stimmbezirk kein Briefwahlbezirk, 
+              # wird mit 0 multipliziert; nur die Briefwahl-Stimmbezirke zählen.
+              briefwahl = sum((typ == "B") * stimmen),
+              across(meldungen_anz:nein, ~ sum(.,na.rm = T))) %>%
+    rename(nr = ortsteilnr) %>% 
+    # Stadtteilnamen, 2018er Ergebnisse, Geokoordinaten dazuholen
+    left_join(stadtteile_df, by="nr") %>% 
+    # Nach Ortsteil sortieren
+    arrange(nr) %>% 
+    # Wichtige Daten für bessere Lesbarkeit nach vorn
+    relocate(zeitstempel,nr,name,lon,lat)
+  
+  # Sicherheitscheck: Warnen, wenn nicht alle Ortsteile zugeordnet
+  if (nrow(ortsteile_df) != nrow(stadtteile_df)) teams_warnung("Nicht alle Ortsteile zugeordnet")
+  if (nrow(zuordnung_stimmbezirke_df) != length(unique(stimmbezirke_df$nr))) teams_warnung("Nicht alle Stimmbezirke zugeordnet")
+  return(ortsteile_df)
+}
+
+
+# Aggregation auf Wahllokal-Ebene
+aggregiere_wahllokale <- function(stimmbezirke_df) {
+  wahllokale_df <- stimmbezirke_df %>% 
+    # Zuordnung der Stimmbezirke zu Ortsteilen
+    left_join(zuordnung_stimmbezirke_df,by=c("nr","name")) %>%
+    # Zuordnung der Stimmbezirke zu Wahllokalen über die Stimmbezirks-Nr
+    left_join(opendata_wahllokale_df %>% 
+                select (nr = `Bezirk-Nr`,
+                        typ = `Bezirk-Art`, # W = Wahllokal, B = Bezirk,
+                        wl_name = `Wahlraum-Bezeichnung`,
+                        adresse = `Wahlraum-Adresse`), 
+              by = "nr")  %>% 
+    # Stadtteilnamen, 2018er Ergebnisse dazuholen
+    left_join(stadtteile_df %>% 
+                select(ortsteilnr = nr,
+                       ortsteil = name, 
+                       wahlberechtigt_2018,
+                       waehler_2018,
+                       gueltig_2018,
+                       feldmann_2018), by="ortsteilnr") %>%
+    # Die Bezeichner-Felder nach vorn sortieren
+    relocate(zeitstempel, 
+             nr,
+             name,
+             wl_name,
+             typ,
+             adresse,
+             ortsteilnr,
+             ortsteil) %>% 
+    # Nach Wahllokal aggregieren  
+    group_by(wl_name, adresse) %>% 
+    summarize(zeitstempel = last(zeitstempel),
+              wl_name = last(wl_name),
+              typ = last(typ),
+              adresse = last(adresse),
+              ortsteil = last(ortsteil),
+              across(meldungen_anz:nein, ~ sum(.,na.rm = T))) %>%
+    # Nach Ortsteil sortieren
+    arrange(ortsteil) 
+  # Sicherheitscheck: Warnen, wenn nicht alle Wahllokale zugeordnet
+  if (nrow(wahllokale_df) != length(unique(opendata_wahllokale_df$`Wahlraum-Bezeichnung`))) teams_warnung("Nicht alle Stimmbezirke zugeordnet")
+  return(ortsteile_df)
+}
+
+
+
 lies_stadtteil_direkt <- function(stand_url = ortsteile_url) {
   neu_df <- lies_gebiet(stand_url)  %>%
     # nr bei Ortsteil-Daten leer/ignorieren

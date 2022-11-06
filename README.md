@@ -72,7 +72,7 @@ Nutzt die Livedaten von https://wahlen.frankfurt.de - die aktuellen Daten nach O
  -  D1 : Ja-Stimmen
  -  D2 : Nein-Stimmen
  
-Es gibt 575 Stimmbezirke - also administrative Auszählungs-Einheiten. Fast 200 von diesen "Bezirken" sind die Briefwahl-Auszählungen - sie werden alle in der Messe ausgezählt. Insgesamt gibt es 2019 Wahllokale. (vgl. index/opendata-wahllokale.csv)
+Es gibt 575 Stimmbezirke - also administrative Auszählungs-Einheiten. Fast 200 von diesen "Bezirken" sind die Briefwahl-Auszählungen - sie werden alle in der Messe ausgezählt. Insgesamt gibt es 219 Wahllokale. (vgl. index/opendata-wahllokale.csv)
  
 ## Wann gibt es wo Daten?
  

@@ -66,3 +66,24 @@ opendata_wahllokale_df <- read_csv2("index/opendata-wahllokale.csv")
 
 save(stadtteile_df,zuordnung_stimmbezirke_df,opendata_wahllokale_df,file ="index/index.rda")
 
+#---- Leere Daten pushen - in alle Tabellen----
+leerdaten_stimmbezirk_df <- lies_gebiet("https://votemanager-ffm.ekom21cdn.de/2022-11-06/06412000/praesentation/Open-Data-06412000-Buergerentscheid-zur-Abwahl-des-Oberbuergermeisters-der-Stadt-Frankfurt-am-Main_-Herrn-Peter-Feldmann-Stimmbezirk.csv?ts=1667662273015")
+leerdaten_ort_df <- leerdaten_stimmbezirk_df %>% 
+  aggregiere_stadtteile() %>% 
+  mutate(quorum = ifelse(wahlberechtigt == 0,
+                         0,
+                         ja / wahlberechtigt * 100)) %>% 
+  mutate(status = ifelse(meldungen_anz == 0,
+                         "KEINE DATEN",
+                         paste0(ifelse(meldungen_anz < meldungen_max,
+                                       "TREND ",""),
+                                ifelse(ja < nein,
+                                       "NEIN",
+                                       ifelse(quorum < 30,
+                                              "JA",
+                                              "JA QUORUM")))
+  ))
+
+dw_data_to_chart(leerdaten_ort_df,choropleth_id)
+dw_data_to_chart(leerdaten_ort_df,symbol_id)
+dw_data_to_chart(leerdaten_ort_df,tabelle_id)

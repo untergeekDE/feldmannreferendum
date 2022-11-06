@@ -1,10 +1,23 @@
 #' aktualisiere_karten.R
 
 
+# Diese Funktion schaltet zwischen den beiden Aggregier-Funktionen um:
+# der mit Briefwahl und der ohne Briefwahl. 
+# Wenn alle Stimmbezirke ausgezählt sind, wird die Briefwähler-Stimmenzahl
+# dazu gerechnet. 
+switcher_aggregiere <- function(stimmbezirke_df) {
+  if (sum(stimmbezirke_df$meldungen_anz) == sum(stimmbezirke_df$meldungen_max)) {
+    aggregiere_stadtteile_mit_briefwahl(stimmbezirke_df)
+  } else {
+    aggregiere_stadtteile(stimmbezirke_df)
+  }
+}
+
 aktualisiere_karten <- function(wl_url = stimmbezirke_url) {
   # Lies Ortsteil-Daten ein und vergleiche
   neue_orts_df <- lies_gebiet(wl_url) %>% 
-    aggregiere_stadtteile() %>% 
+    # aggregiere_stadtteile() %>% 
+    switcher_aggregiere() %>% 
     mutate(quorum = ifelse(wahlberechtigt == 0,
                            0,
                            ja / wahlberechtigt * 100)) %>% 
@@ -18,11 +31,11 @@ aktualisiere_karten <- function(wl_url = stimmbezirke_url) {
                                                  "JA",
                                                  "JA QUORUM")))
     ))
-  alte_orts_df <- hole_letztes_df("daten/ortsteile")
-  # Datenstand identisch? Dann brich ab. 
-  if(vergleiche_stand(alte_orts_df,neue_orts_df)) {
-    return(FALSE) 
-  } else {
+  # alte_orts_df <- hole_letztes_df("daten/ortsteile")
+  # # Datenstand identisch? Dann brich ab. 
+  # if(vergleiche_stand(alte_orts_df,neue_orts_df)) {
+  #   return(FALSE) 
+  # } else {
     # Zeitstempel holen
     archiviere(neue_orts_df,"daten/ortsteile")
     ts <- neue_orts_df %>% pull(zeitstempel) %>% last()
@@ -45,5 +58,6 @@ aktualisiere_karten <- function(wl_url = stimmbezirke_url) {
     dw_publish_chart(choropleth_id)
     dw_publish_chart(tabelle_id)
     return(TRUE)
-  }
+  #}
 }
+
